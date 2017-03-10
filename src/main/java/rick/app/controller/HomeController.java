@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.json.JSONObject;
 
 //models
 import rick.app.models.*;
@@ -60,6 +63,13 @@ public class HomeController {
 	@ModelAttribute("another")
 	public String getAnother(){
 		return "yes amn";
+	}
+	
+	@RequestMapping(value = "/test")
+	public @ResponseBody String test(@RequestBody String data1){
+		JSONObject obj = new JSONObject();
+		obj.put("data",data1);
+		return obj.toString();
 	}
 	
 }

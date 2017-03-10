@@ -15,8 +15,9 @@
 			<@spring.url "/index" /> <br>
 			<h2>Hello Rick!</h2>
 			<div>
-			<a href='/page1'>Page1</a><br>
-			<a href='/chat'>Chat</a><br>
+				<input type='text' class='form-control col-md-3' ng-model='txt' />
+				<button class='btn' ng-click='doAjax()'>DoAjax</button>
+				<br>{{yes}}<br>
 			</div>
 			<br>
 			${another}
@@ -39,8 +40,24 @@
 		var app = angular.module("app",[]);
 		app.controller("demo",Demo);
 		console.log("123");
-		function Demo($scope){
+		function Demo($scope,$http){
 			$scope.t = "testMsg";
+			$scope.option = {
+				data:$scope.txt
+			};
+			$scope.doAjax = function(){
+				$http({
+					method:'POST',
+					url:'<@spring.url "/test" />',
+					data:$.param({data1:$scope.txt}),	//to serial data or must using file_get_contents to get post data
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+				}).then(function success(msg){
+					console.log(msg.data);
+					$scope.yes = msg.data.data;
+				},function error(err,status,headers,config){
+					console.log(err);
+				});
+			}
 		}
 		
 	</script>
