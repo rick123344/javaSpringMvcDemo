@@ -7,7 +7,7 @@ Before run application, you must have  [Gradle Installed](https://gradle.org/) a
 ```sh
 $ git clone https://github.com/rick123344/javaSpringMvcDemo.git 
 $ cd javaSpringMvcDemo
-$ gradle clean install
+$ gradle clean build
 $ java -jar build\libs\webService.jar
 ```
 
