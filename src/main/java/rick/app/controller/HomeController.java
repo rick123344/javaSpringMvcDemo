@@ -32,7 +32,16 @@ public class HomeController {
 	
     @RequestMapping("/home")
     public String home(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model,HttpServletRequest req) {
-        model.addAttribute("name", name);
+        
+		//get the Bean data
+		/*AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.register(Config.class);
+		ctx.refresh();
+		MessageSource resources = ctx.getBean(MessageSource.class);
+		String admin = resources.getMessage("user.admin", null, "Default", null);
+		System.out.println(admin);*/
+		
+		model.addAttribute("name", name);
 		req.setAttribute("test","123456789");
 		
 		List<String> lang = new ArrayList<String>();
@@ -45,15 +54,6 @@ public class HomeController {
 			lang.add(ticks.toString());
 		}
 		getAnother();
-		//get the Bean data
-		/*AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		ctx.register(Config.class);
-		ctx.refresh();
-		MessageSource resources = ctx.getBean(MessageSource.class);
-		String admin = resources.getMessage("user.admin", null, "Default", null);
-		System.out.println(admin);*/
-		
-		
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
 

@@ -49,25 +49,3 @@ jar {
     baseName = 'webService'
     //version =  '0.1.0'
 }
-//this task test for remote postgresql db is connected...
-import groovy.sql.Sql
-apply plugin: 'groovy'
-task jdbctest{
-
-	doLast{
-		//println "jdbc drivers: "+Class.forName("org.postgresql.Driver")
-		//println "connecting to database"
-		def db = [
-			url:"jdbc:postgresql://ec2-54-163-234-140.compute-1.amazonaws.com:5432/dat6a739fq4uhg?sslmode=require",
-			user: 'anqjcagciofbxt',
-			password: 'de4155895419470f1bf4eb3b24ecf21392133a876f7d7bff36ea64078d37c33b',
-			driver:"org.postgresql.Driver"
-		]
-		def sql= Sql.newInstance(db.url,db.user,db.password,db.driver)
-		//sql.execute("select * from ticks")
-		sql.eachRow('select * from ticks'){ row->
-			println "$row"
-		}
-		sql.close()
-	}
-}
