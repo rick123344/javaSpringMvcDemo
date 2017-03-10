@@ -1,0 +1,73 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+// JDK 8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+buildscript {
+	repositories {
+        mavenCentral()
+		maven {url "https://maven.atlassian.com/3rdparty"}
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+		classpath('postgresql:postgresql:9.4.1208-jdbc42-atlassian-hosted')
+    }
+}
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+	maven {url "https://maven.atlassian.com/3rdparty"}
+	maven {url "https://artifacts.alfresco.com/nexus/content/repositories/public/"}
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
+	compile("org.springframework.boot:spring-boot-starter-freemarker")	//using freemaker
+	compile("org.freemarker:freemarker:2.3.25-incubating")
+	compile("org.springframework.boot:spring-boot-starter-data-jpa:1.5.2.RELEASE") //jap support
+	//compile group: 'org.springframework', name: 'spring-context-support', version: '5.0.0.M5'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.1'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
+	//compile group: 'org.springframework', name: 'spring-web', version: '5.0.0.M5'
+
+	runtime group: 'postgresql', name: 'postgresql', version: '9.4.1208-jdbc42-atlassian-hosted'
+	
+    testCompile("junit:junit")
+	testCompile("org.springframework.boot:spring-boot-starter-test")
+
+}
+
+jar {
+    baseName = 'webService'
+    //version =  '0.1.0'
+}
+//this task test for remote postgresql db is connected...
+import groovy.sql.Sql
+apply plugin: 'groovy'
+task jdbctest{
+
+	doLast{
+		//println "jdbc drivers: "+Class.forName("org.postgresql.Driver")
+		//println "connecting to database"
+		def db = [
+			url:"jdbc:postgresql://ec2-54-163-234-140.compute-1.amazonaws.com:5432/dat6a739fq4uhg?sslmode=require",
+			user: 'anqjcagciofbxt',
+			password: 'de4155895419470f1bf4eb3b24ecf21392133a876f7d7bff36ea64078d37c33b',
+			driver:"org.postgresql.Driver"
+		]
+		def sql= Sql.newInstance(db.url,db.user,db.password,db.driver)
+		//sql.execute("select * from ticks")
+		sql.eachRow('select * from ticks'){ row->
+			println "$row"
+		}
+		sql.close()
+	}
+}
