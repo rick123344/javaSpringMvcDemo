@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +26,7 @@ import org.json.JSONObject;
 
 //models
 import rick.app.models.*;
+import rick.app.viewmodels.*;
 
 @Controller
 public class HomeController {
@@ -59,17 +61,35 @@ public class HomeController {
 		getAnother();
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
-
+	
 	@ModelAttribute("another")
 	public String getAnother(){
 		return "yes amn";
 	}
 	
 	@RequestMapping(value = "/test")
-	public @ResponseBody String test(@RequestBody String data1){
+	public @ResponseBody String test(@RequestBody String tick,HttpServletRequest req,@RequestParam("tick") String t){
 		JSONObject obj = new JSONObject();
-		obj.put("data",data1);
+		obj.put("data",t);
+		obj.put("test",req.getParameter("id").toString());
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/test2")
+	public @ResponseBody String test2(@ModelAttribute(value="myform") UserViewModel user,@RequestBody String s){
+		JSONObject obj = new JSONObject();
+		System.out.println(s);
+		System.out.println(user);
+		obj.put("data",user);
+		//obj.put("test",req.getParameter("id").toString());
 		return obj.toString();
 	}
 	
 }
+
+/********************************************************
+
+@ModelAttribute using model class is ViewModel,
+not JPA model
+
+********************************************************/

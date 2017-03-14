@@ -20,6 +20,14 @@ public class Ticks{
 		this.tick = tick;
 	}
 	
+	public String getTick(){
+		return tick;
+	}
+	
+	public Long getId(){
+		return id;
+	}
+	
 	@Override
 	public String toString(){
 		return String.format("Tick : [id=%d ,value=%s ]",id,tick);

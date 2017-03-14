@@ -49,3 +49,7 @@ jar {
     baseName = 'webService'
     //version =  '0.1.0'
 }
+//when run boot (debug run) , always get resources 
+bootRun {
+    addResources = true
+}
