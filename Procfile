@@ -1,1 +1,1 @@
-#java -jar build\libs\webService.jar
+web: java -jar build\libs\webService.jar
