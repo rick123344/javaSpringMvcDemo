@@ -31,8 +31,8 @@
 					<input type='text' name='id' ng-model='myform.id'/>
 					<input type='text' name='name' ng-model='myform.user'/>
 					<input type='text' name='age' ng-model='myform.age'/>
-					<input type='checkbox' name='links' value='TT1'>TT1
-					<input type='checkbox' name='links' value='TT2'>TT2
+					<input type='text' name='links' value='TT1'>
+					<input type='text' name='links' value='TT2'>
 					<button type='submit' class='btn' name='submit'>submit</button>
 				</form>
 			</div>
