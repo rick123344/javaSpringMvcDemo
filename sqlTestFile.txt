@@ -1,0 +1,37 @@
+CREATE table publish(
+	id serial PRIMARY KEY,
+	name varchar(50)
+	
+);
+
+CREATE table author(
+	id serial PRIMARY KEY,
+	name varchar(50),
+	age integer
+);
+
+CREATE table books(
+	id serial PRIMARY KEY,
+	publish_id integer,
+	author_id integer,
+	name varchar(50),
+	price integer
+);
+
+CREATE table sold(
+	id serial PRIMARY KEY,
+	books_id integer,
+	count integer
+);
+
+
+INSERT INTO publish(name) VALUES('PA'),('PB'),('PC');
+
+INSERT INTO author(name,age) VALUES('rick','20'),('kevin','30'),('showeve','28');
+
+INSERT INTO books(name,price,publish_id,author_id) VALUES('doYou',360,1,2),('Maths',268,1,1),('FindYou',300,3,3),('Money',390,2,3);
+
+INSERT INTO sold(books_id,count) VALUES(1,6),(2,7),(3,6),(4,5),(2,6);
+
+
+

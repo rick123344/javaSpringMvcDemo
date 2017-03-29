@@ -9,11 +9,13 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Ticks{
-	
+public class Books{
 	@Id
-	//@GeneratedValue(strategy=GenerationType.AUTO)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String tick;
+	private String name;
+	private Long price;
+	private Long publish_id;
+	private Long author_id;
+	
 }

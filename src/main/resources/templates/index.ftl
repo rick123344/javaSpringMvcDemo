@@ -13,6 +13,7 @@
 			<@spring.message "user.admin"/> <br>
 			<@spring.messageText  "user.adb","Default" /> <br>
 			<@spring.url "/index" /> <br>
+			<@spring.message "user.hi"/> <br>
 			<h2>Hello Rick!</h2>
 			<div>
 				<input type='text' class='form-control col-md-3' ng-model='txt' />
@@ -23,11 +24,16 @@
 			<br>
 			${another}
 			<br>
+			${pub.toString()}
 			
 			<div>
-				<form id='myform'>
+				<form id='myform' action='<@spring.url "/test2" />' method='post'>
 					<input type='text' name='id' ng-model='myform.id'/>
-					<input type='text' name='user' ng-model='myform.user'/>
+					<input type='text' name='name' ng-model='myform.user'/>
+					<input type='text' name='age' ng-model='myform.age'/>
+					<input type='checkbox' name='links' value='TT1'>TT1
+					<input type='checkbox' name='links' value='TT2'>TT2
+					<button type='submit' class='btn' name='submit'>submit</button>
 				</form>
 			</div>
 			
@@ -51,10 +57,11 @@
 		
 		function Demo($scope,$http){
 			$scope.t = "testMsg";
-			
+			$scope.link = ["1","2","3","4","5"];
 			$scope.myform = {
 				id:"6",
 				user:"abccc",
+				age:"22",
 			}
 			
 			$scope.doAjax = function(){
@@ -72,11 +79,12 @@
 			}
 			
 			$scope.doAjax2 = function(){
+				var test = {0:"5",1:"6"};
 				$http({
 					method:'POST',
-					url:'<@spring.url "/test2" />',
+					url:'<@spring.url "/testEntityModel" />',
 					//why to bind viewmodel with java =>1. $("#myform").serialize(); 2. javascript object with param
-					data:$.param({id:$scope.myform.id,user:$scope.myform.user}),//$("#myform").serialize() //to serial data or must using file_get_contents to get post data
+					data:$.param({id:$scope.myform.id,name:$scope.myform.user,age:$scope.myform.age,links:test}),//$("#myform").serialize() //to serial data or must using file_get_contents to get post data
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'}//{'Content-type': 'application/json'} //{'Content-Type': 'application/x-www-form-urlencoded'}
 				}).then(function success(msg){
 					console.log(msg.data);
@@ -87,6 +95,22 @@
 			}
 			
 		}
+		
+		
+		
+		$.ajax({
+			url:"/doajax",
+			type:"post",
+			data:{user:"uuuu"},
+			success:function(msg){
+				console.log(msg);
+			},
+			error:function(xhr,status,e){
+				console.log(e);
+			}
+		})
+		
+		
 		
 	</script>
 	

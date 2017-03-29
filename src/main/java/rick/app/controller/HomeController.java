@@ -26,7 +26,6 @@ import org.json.JSONObject;
 
 //models
 import rick.app.models.*;
-import rick.app.viewmodels.*;
 
 @Controller
 public class HomeController {
@@ -58,13 +57,29 @@ public class HomeController {
 		for (Ticks ticks : repository.findAll()) {
 			lang.add(ticks.toString());
 		}
+		
+		System.out.println(test.妳好);
+		System.out.println(test.妳好.value());
+		
 		getAnother();
+		
+		getPublish();
+		
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
 	
 	@ModelAttribute("another")
 	public String getAnother(){
 		return "yes amn";
+	}
+	
+	@ModelAttribute("pub")
+	public Publish getPublish(){
+		Publish p = new Publish();
+		p.setName("SmilePublish");
+		p.setId(new Long(55));
+		p.setBooks_id("B889");
+		return p;
 	}
 	
 	@RequestMapping(value = "/test")
@@ -75,21 +90,47 @@ public class HomeController {
 		return obj.toString();
 	}
 	
-	@RequestMapping(value = "/test2")
-	public @ResponseBody String test2(@ModelAttribute(value="myform") UserViewModel user,@RequestBody String s){
+	@RequestMapping(value = "/testEntityModel")
+	public @ResponseBody String testEntityModel(@ModelAttribute(value="myform") Author author,@RequestBody String s){
 		JSONObject obj = new JSONObject();
 		System.out.println(s);
-		System.out.println(user);
-		obj.put("data",user);
+		System.out.println(author);
+		obj.put("data",author);
 		//obj.put("test",req.getParameter("id").toString());
 		return obj.toString();
 	}
 	
+	@RequestMapping(value = "/test2")
+	@ResponseBody
+	public String test2(@ModelAttribute(value="myform") Author author,@RequestBody String s){
+		JSONObject obj = new JSONObject();
+		System.out.println(s);
+		System.out.println(author);
+		obj.put("data",author);
+		
+		/*for(String l : author.getLinks()){
+			obj.put(l,l);
+		}*/
+		
+		obj.put("s",s);
+		//obj.put("test",req.getParameter("id").toString());
+		return obj.toString();
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/doajax")
+	public String test(@RequestParam("user") String t){
+		return t;
+	}
+	
 }
 
-/********************************************************
-
-@ModelAttribute using model class is ViewModel,
-not JPA model
-
-********************************************************/
+enum test{
+	妳好(5);
+	
+	test(int value){this.value=value;}
+	private int value;
+	public int value(){return value;}
+	
+}
