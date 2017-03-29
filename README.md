@@ -2,6 +2,10 @@
 
 Before run application, you must have  [Gradle Installed](https://gradle.org/) and [Java Installed](http://www.oracle.com/technetwork/indexes/downloads/index.html#java)
 
+## See Online Demo
+
+Visit Demo on [https://rick-spring-demo.herokuapp.com/home](https://rick-spring-demo.herokuapp.com/home)
+
 ## How to run
 
 1. run with jar (packaged) 
