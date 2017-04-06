@@ -32,7 +32,7 @@
 						</#list>
 					</div>
 				</div>
-				<div class='col-md-6' id='pharse-example'>
+				<div class='col-md-6' id='phaser-example'>
 					
 				</div>
 			</div>
@@ -164,7 +164,7 @@
 			var weapon;
 			var cursors;
 			var fireButton;
-			var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', {
+			var game = new Phaser.Game(500,360, Phaser.CANVAS, 'phaser-example', {
 				preload: preload,
 				create: create,
 				update:update,
@@ -178,12 +178,12 @@
 			
 			function create() {
 				//  加入一個 Sprite, 影像來源就是一開始載入的圖片
-				weapon = game.add.weapon(30,'bullet');
+				weapon = game.add.weapon(30,'bullet');    
 				weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;//bullet killed when outside bounds
 				weapon.bulletAngleOffset = 90;//rotation
 				weapon.bulletSpeed = 400;//speed
 				weapon.fireRate = 60;
-				sprite = this.add.sprite(320,500,'ship');
+				sprite = this.add.sprite(0,300,'ship');
 				game.physics.arcade.enable(sprite);
 				
 				weapon.trackSprite(sprite, 14, 0);//bullet follow ship horizon 14px, 0 vertical
