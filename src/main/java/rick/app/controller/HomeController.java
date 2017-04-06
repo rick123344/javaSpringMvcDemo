@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +31,28 @@ import org.json.JSONObject;
 
 //models
 import rick.app.models.*;
-
+import rick.app.config.*;
 @Controller
 public class HomeController {
 	
+	public static String path = "";
+	public static String silder = "";
 	//init implement repository (because can't be new )
 	@Autowired
 	private TicksRepository repository;
 	
+	HomeController(){
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.register(Config.class);
+		ctx.refresh();
+		MessageSource resources = ctx.getBean(MessageSource.class);
+		path = System.getProperty("user.dir")+resources.getMessage("Sys.uploadPath", null, "Default", null);
+		silder = System.getProperty("user.dir")+resources.getMessage("Sys.slidePath", null, "Default", null);
+		System.out.println(path+silder);
+	}
+	
     @RequestMapping("/home")
-    public String home(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model,HttpServletRequest req) {
+    public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model,HttpServletRequest req) {
         
 		//get the Bean data
 		/*AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
@@ -58,15 +75,52 @@ public class HomeController {
 			lang.add(ticks.toString());
 		}
 		
-		System.out.println(test.妳好);
-		System.out.println(test.妳好.value());
-		
+		//System.out.println(test.妳好);
+		//System.out.println(test.妳好.value());
 		getAnother();
-		
 		getPublish();
 		
+		File file = new File(path);
+		model.addAttribute("files",file.listFiles());
+		
+		
+		List<Map> silderss = new ArrayList<Map>();
+		file = new File(silder);
+		for(File i : file.listFiles()){
+			Map silders = new HashMap();
+			silders.put("path","/Silder/"+i.getName());
+			silders.put("tag",i.getName());
+			silders.put("descript","Beautiful Place "+i.getName());
+			silderss.add(silders);
+		}
+		model.addAttribute("silder",silderss);
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
+	
+	@RequestMapping("/upload")
+    public String upload(@RequestParam("atta") MultipartFile[] files,Model model) {
+		//System.out.println("testUpload");
+		
+		File dir = new File(path);
+		if(!dir.exists()){
+			try{
+				dir.mkdir();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		System.out.println(path);
+		try{
+			for(MultipartFile uploadedFile : files) {
+				File file = new File(path + uploadedFile.getOriginalFilename());
+				uploadedFile.transferTo(file);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return "redirect:home";
+	}
 	
 	@ModelAttribute("another")
 	public String getAnother(){
@@ -87,6 +141,7 @@ public class HomeController {
 		JSONObject obj = new JSONObject();
 		obj.put("data",t);
 		obj.put("test",req.getParameter("id").toString());
+		
 		return obj.toString();
 	}
 	
@@ -116,7 +171,6 @@ public class HomeController {
 		//obj.put("test",req.getParameter("id").toString());
 		return obj.toString();
 	}
-	
 	
 	@ResponseBody
 	@RequestMapping(value = "/doajax")

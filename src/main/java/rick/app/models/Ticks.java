@@ -17,3 +17,6 @@ public class Ticks{
 	private Long id;
 	private String tick;
 }
+/*
+
+*/

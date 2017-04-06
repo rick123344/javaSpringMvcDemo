@@ -1,3 +1,9 @@
+CREATE table ticks(
+	id serial PRIMARY KEY,
+	tick text
+	
+);
+
 CREATE table publish(
 	id serial PRIMARY KEY,
 	name varchar(50)
@@ -24,6 +30,7 @@ CREATE table sold(
 	count integer
 );
 
+INSERT INTO ticks(tick) VALUES('hello first ticks');
 
 INSERT INTO publish(name) VALUES('PA'),('PB'),('PC');
 

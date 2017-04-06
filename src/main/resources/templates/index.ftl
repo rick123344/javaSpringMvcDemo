@@ -7,9 +7,36 @@
 		<script src="/js/jquery.min.js"></script>
 		<script src="/js/angular1.5.8.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/phaser.min.js"></script>
 	</head>
     <body ng-controller='demo'>
 		<div class='container'> 
+		
+			<div class='row'>
+				<div id='myCarousel' class='carousel slide col-md-6' data-ride='carousel'>
+					<ol class='carousel-indicators'>
+						<li class='' data-target='#myCarousel' data-slide-to='0'></li>
+						<li data-target='#myCarousel' data-slide-to='1'></li>
+						<li data-target='#myCarousel' data-slide-to='2'></li>
+					</ol>
+					
+					<div class='carousel-inner' role="listbox">
+						<#list silder as s>
+							<div class='item <#if s.tag=="silder1.jpg">active</#if>'>
+								<img src="${s.path}" height='200px'>
+								<div class='carousel-caption'>
+									<h3>${s.tag}</h3>
+									<p>${s.descript}</p>
+								</div>
+							</div>
+						</#list>
+					</div>
+				</div>
+				<div class='col-md-6' id='pharse-example'>
+					
+				</div>
+			</div>
+			
 			<@spring.message "user.admin"/> <br>
 			<@spring.messageText  "user.adb","Default" /> <br>
 			<@spring.url "/index" /> <br>
@@ -37,6 +64,13 @@
 				</form>
 			</div>
 			
+			<div>
+				<form id='myform' action='<@spring.url "/upload" />' method='post' enctype="multipart/form-data">
+					<input type='file' name='atta' multiple>
+					<button type='submit' class='btn' name='upload'>Upload</button>
+				</form>
+			</div>
+			
 			<#if test='123456789'>abc</#if><br>
 			<#if test='99999'>99999</#if><br>
 			${test}<br>
@@ -47,9 +81,25 @@
 			</#list>
 			hihihi
 			<span>test</span>hihihi
+			<br>
+			
+			<div class='row'>
+				<#list files as file>
+					<div class='col-md-3 thumbnail'>
+						${file.getName()}
+						<img src='/Upload/${file.getName()}'/>
+					</div>
+				</#list>
+			</div>
+			
 		</div>
     </body>
-	
+	<style>
+	.carousel-inner > .item > img {
+		width:1000px;
+		height:360px;
+	}
+	</style>
 	<script>
 		console.log("99dd");
 		var app = angular.module("app",[]);
@@ -63,7 +113,7 @@
 				user:"abccc",
 				age:"22",
 			}
-			
+			pharseGame();
 			$scope.doAjax = function(){
 				$http({
 					method:'POST',
@@ -94,9 +144,8 @@
 				});
 			}
 			
+			
 		}
-		
-		
 		
 		$.ajax({
 			url:"/doajax",
@@ -110,6 +159,55 @@
 			}
 		})
 		
+		function pharseGame(){
+			var sprite;
+			var weapon;
+			var cursors;
+			var fireButton;
+			var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', {
+				preload: preload,
+				create: create,
+				update:update,
+				render:render
+			});
+			function preload() {
+				//  載入一張圖片, 將名稱命名為 pikachu
+				game.load.image('bullet', '/Phaser/sprites/bullet.png');
+				game.load.image('ship', '/Phaser/sprites/shmup-ship.png');
+			}
+			
+			function create() {
+				//  加入一個 Sprite, 影像來源就是一開始載入的圖片
+				weapon = game.add.weapon(30,'bullet');
+				weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;//bullet killed when outside bounds
+				weapon.bulletAngleOffset = 90;//rotation
+				weapon.bulletSpeed = 400;//speed
+				weapon.fireRate = 60;
+				sprite = this.add.sprite(320,500,'ship');
+				game.physics.arcade.enable(sprite);
+				
+				weapon.trackSprite(sprite, 14, 0);//bullet follow ship horizon 14px, 0 vertical
+				cursors = this.input.keyboard.createCursorKeys();
+				fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+			}
+			
+			function update(){
+				sprite.body.velocity.x = 0;
+				if (cursors.left.isDown){
+					sprite.body.velocity.x = -200;
+				}else if (cursors.right.isDown){
+					sprite.body.velocity.x = 200;
+				}
+				if (fireButton.isDown){
+					weapon.fire();
+				}
+			}
+			
+			function render(){
+				weapon.debug();
+			}
+			
+		}
 		
 		
 	</script>
