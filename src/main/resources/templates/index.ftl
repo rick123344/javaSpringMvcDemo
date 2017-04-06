@@ -246,6 +246,10 @@
 					hero.body.velocity.x = -200;
 				}else if (cursors.right.isDown){
 					hero.body.velocity.x = 200;
+				}else if (cursors.up.isDown){
+					hero.body.velocity.y = 200;
+				}else if (cursors.down.isDown){
+					hero.body.velocity.y = -200;
 				}
 				if (fireButton.isDown){
 					//weapon.fire(); 
