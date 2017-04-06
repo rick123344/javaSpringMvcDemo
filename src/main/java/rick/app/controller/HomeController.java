@@ -74,7 +74,6 @@ public class HomeController {
 		for (Ticks ticks : repository.findAll()) {
 			lang.add(ticks.toString());
 		}
-		
 		//System.out.println(test.妳好);
 		//System.out.println(test.妳好.value());
 		getAnother();
@@ -88,7 +87,7 @@ public class HomeController {
 		file = new File(silder);
 		for(File i : file.listFiles()){
 			Map silders = new HashMap();
-			silders.put("path","/Silder/"+i.getName());
+			silders.put("path","/Silder/"+i.getName());//
 			silders.put("tag",i.getName());
 			silders.put("descript","Beautiful Place "+i.getName());
 			silderss.add(silders);
@@ -136,11 +135,29 @@ public class HomeController {
 		return p;
 	}
 	
+	public Ticks getTick(){
+		Ticks t = new Ticks();
+		//t.setId(new Long(6));
+		t.setTick("abcdefg");
+		return t;
+	}
+	
 	@RequestMapping(value = "/test")
 	public @ResponseBody String test(@RequestBody String tick,HttpServletRequest req,@RequestParam("tick") String t){
 		JSONObject obj = new JSONObject();
 		obj.put("data",t);
 		obj.put("test",req.getParameter("id").toString());
+		
+		
+		Ticks tes = repository.save(getTick());
+		System.out.println(tes.getId());
+		System.out.println(tes.getTick());
+		
+		Ticks tt = repository.findOne(new Long(1));
+		System.out.println(tt.getId());
+		System.out.println(tt.getTick());
+		
+		repository.delete(tes.getId());
 		
 		return obj.toString();
 	}

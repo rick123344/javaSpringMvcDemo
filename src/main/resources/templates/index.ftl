@@ -64,12 +64,12 @@
 				</form>
 			</div>
 			
-			<div>
+			<!--<div>
 				<form id='myform' action='<@spring.url "/upload" />' method='post' enctype="multipart/form-data">
 					<input type='file' name='atta' multiple>
 					<button type='submit' class='btn' name='upload'>Upload</button>
 				</form>
-			</div>
+			</div>-->
 			
 			<#if test='123456789'>abc</#if><br>
 			<#if test='99999'>99999</#if><br>
@@ -82,15 +82,16 @@
 			hihihi
 			<span>test</span>hihihi
 			<br>
-			
-			<div class='row'>
+			<input type='radio' name='tof' value='true'>1
+			<input type='radio' name='tof' value='false'>0
+			<!--<div class='row'>
 				<#list files as file>
 					<div class='col-md-3 thumbnail'>
 						${file.getName()}
-						<img src='/Upload/${file.getName()}'/>
+						<img src='${file}'/>
 					</div>
 				</#list>
-			</div>
+			</div>-->
 			
 		</div>
     </body>
@@ -160,10 +161,17 @@
 		})
 		
 		function pharseGame(){
-			var sprite;
+			var hero;
+			var aliens;
+			var bullets;
+			var enemyBullets;
+			var explosions;
 			var weapon;
 			var cursors;
 			var fireButton;
+			var bulletTime;
+			var firingTimer;
+			var livingEnemies = [];
 			var game = new Phaser.Game(500,360, Phaser.CANVAS, 'phaser-example', {
 				preload: preload,
 				create: create,
@@ -172,41 +180,155 @@
 			});
 			function preload() {
 				//  載入一張圖片, 將名稱命名為 pikachu
-				game.load.image('bullet', '/Phaser/sprites/bullet.png');
+				game.load.spritesheet('bullet', '/Phaser/sprites/rgblaser.png',4,4);
 				game.load.image('ship', '/Phaser/sprites/shmup-ship.png');
+				game.load.image('enemy1', '/Phaser/sprites/space-baddie.png');
+				game.load.image('enemy2', '/Phaser/sprites/space-baddie-purple.png');
+				game.load.image('enemyBullet', '/Phaser/sprites/enemy-bullet.png');
+				game.load.spritesheet('kaboom', '/Phaser/sprites/explosion.png',64,64);
+				game.load.image('background', '/Phaser/sprites/background2.png');
 			}
 			
 			function create() {
 				//  加入一個 Sprite, 影像來源就是一開始載入的圖片
-				weapon = game.add.weapon(30,'bullet');    
+				bulletTime = game.time.now;
+				firingTimer = game.time.now;
+				
+				bullets = game.add.group();
+				bullets.enableBody = true;
+				bullets.pyhsicsBodyType = Phaser.Physics.ARCADE;
+				bullets.createMultiple(30,'bullet');
+				bullets.setAll('anchor.x',0.5);
+				bullets.setAll('anchor.y',1);
+				bullets.setAll('outOfBoundsKill',true);
+				bullets.setAll('checkWorldBounds',true);
+				
+				enemyBullets = game.add.group();
+				enemyBullets.enableBody = true;
+				enemyBullets.pyhsicsBodyType = Phaser.Physics.ARCADE;
+				enemyBullets.createMultiple(30,'enemyBullet');
+				enemyBullets.setAll('anchor.x',0.5);
+				enemyBullets.setAll('anchor.y',1);
+				enemyBullets.setAll('outOfBoundsKill',true);
+				enemyBullets.setAll('checkWorldBounds',true);
+				
+				hero = this.add.sprite(0,300,'ship');
+				hero.anchor.setTo(0.5,0.5);//偏移
+				game.physics.enable(hero,Phaser.Physics.ARCADE);
+				
+				aliens = game.add.group();
+				aliens.enableBody = true;
+				aliens.physicsBodyType = Phaser.Physics.ARCADE;
+				
+				explosions = game.add.group();
+				explosions.createMultiple(30, 'kaboom');
+				explosions.forEach(setupInvader, this);
+				
+				createAliens();
+				
+				weapon = game.add.weapon(30,'bullet');  
+				weapon.setBulletFrames(0, 80, true);				
 				weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;//bullet killed when outside bounds
 				weapon.bulletAngleOffset = 90;//rotation
 				weapon.bulletSpeed = 400;//speed
 				weapon.fireRate = 60;
-				sprite = this.add.sprite(0,300,'ship');
-				game.physics.arcade.enable(sprite);
 				
-				weapon.trackSprite(sprite, 14, 0);//bullet follow ship horizon 14px, 0 vertical
+				
+				
+				weapon.trackSprite(hero, 14, 0);//bullet follow ship horizon 14px, 0 vertical
 				cursors = this.input.keyboard.createCursorKeys();
 				fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 			}
 			
 			function update(){
-				sprite.body.velocity.x = 0;
+				hero.body.velocity.x = 0;
 				if (cursors.left.isDown){
-					sprite.body.velocity.x = -200;
+					hero.body.velocity.x = -200;
 				}else if (cursors.right.isDown){
-					sprite.body.velocity.x = 200;
+					hero.body.velocity.x = 200;
 				}
 				if (fireButton.isDown){
-					weapon.fire();
+					//weapon.fire(); 
+					if(game.time.now > bulletTime){
+						var b = bullets.getFirstExists(false);
+						if(b){
+							b.reset(hero.x,hero.y+8);
+							b.body.velocity.y = -400;
+							bulletTime = game.time.now+100;
+						}
+					}
 				}
+				if(game.time.now>firingTimer){
+					enemyFire();
+				}
+				game.physics.arcade.overlap(bullets,aliens,collisionHandler,null,this);
+				game.physics.arcade.overlap(enemyBullets,hero,enemyHits,null,this);
+				
 			}
-			
+			function enemyFire(){
+				enemyBullet = enemyBullets.getFirstExists(false);
+				livingEnemies.length = 0;
+				aliens.forEachAlive(function(alien){
+					livingEnemies.push(alien);
+				});
+				
+				if(enemyBullet && livingEnemies.length>0){
+					var random = game.rnd.integerInRange(0,livingEnemies.length-1);
+					var shooter = livingEnemies[random];
+					enemyBullet.reset(shooter.body.x,shooter.body.y+20);
+					game.physics.arcade.moveToObject(enemyBullet,hero,120);
+					firingTimer = game.time.now+1000;
+				}
+				
+			}
 			function render(){
 				weapon.debug();
 			}
-			
+			function setupInvader (invader) {
+
+				invader.anchor.x = 0.5;
+				invader.anchor.y = 0.5;
+				invader.animations.add('kaboom');
+
+			}
+			function createAliens () {
+				var alien = aliens.create( 24, 25, 'enemy1');
+				alien.anchor.setTo(0.5, 0.5);
+				alien.animations.add('fly');
+				alien.play('fly');
+				alien.body.moves = false;
+				
+				aliens.x = 100;
+				aliens.y = 50;
+
+				//  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
+				var tween = game.add.tween(alien).to( { x: 400 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+				//moveTox, speed, 
+				var alien = aliens.create( 24, 25, 'enemy2');
+				game.time.events.loop(1000,function(){
+					game.add.tween(alien).to(
+						{
+							x:game.world.randomX,
+							y:game.world.randomY
+						},
+						2000,
+						Phaser.Easing.Quadratic.InOut, 
+						true
+					);
+				},this);
+			}
+			function collisionHandler(bullet,alien){
+				bullet.kill();
+				var explosion = explosions.getFirstExists(false);
+				explosion.reset(alien.body.x,alien.body.y);
+				explosion.play('kaboom',30,false,true);
+			}
+			function enemyHits(hero,enemyBullet){
+				enemyBullet.kill();
+				var explosion = explosions.getFirstExists(false);
+				explosion.reset(hero.body.x,hero.body.y);
+				explosion.play('kaboom',30,false,true);
+			}
 		}
 		
 		
