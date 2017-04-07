@@ -52,7 +52,6 @@
 							<button class='btn' ng-click='doAjax()'>DoAjax</button>
 							<button class='btn' ng-click='doAjax2()'>DoAjax2</button>
 							<br>{{yes}}
-							<br>${another}
 							<br>${pub.toString()}
 						</div>
 					</div>
