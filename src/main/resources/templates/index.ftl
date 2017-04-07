@@ -23,7 +23,7 @@
 					<div class='carousel-inner' role="listbox">
 						<#list silder as s>
 							<div class='item <#if s.tag=="silder1.jpg">active</#if>'>
-								<img src="${s.path}" height='200px'>
+								<img src="${s.path}" height='200px' class=''>
 								<div class='carousel-caption'>
 									<h3>${s.tag}</h3>
 									<p>${s.descript}</p>
@@ -37,61 +37,75 @@
 				</div>
 			</div>
 			
-			<@spring.message "user.admin"/> <br>
-			<@spring.messageText  "user.adb","Default" /> <br>
-			<@spring.url "/index" /> <br>
-			<@spring.message "user.hi"/> <br>
-			<h2>Hello Rick!</h2>
-			<div>
-				<input type='text' class='form-control col-md-3' ng-model='txt' />
-				<button class='btn' ng-click='doAjax()'>DoAjax</button>
-				<button class='btn' ng-click='doAjax2()'>DoAjax2</button>
-				<br>{{yes}}<br>
-			</div>
 			<br>
-			${another}
-			<br>
-			${pub.toString()}
-			
-			<div>
-				<form id='myform' action='<@spring.url "/test2" />' method='post'>
-					<input type='text' name='id' ng-model='myform.id'/>
-					<input type='text' name='name' ng-model='myform.user'/>
-					<input type='text' name='age' ng-model='myform.age'/>
-					<input type='text' name='links' value='TT1'>
-					<input type='text' name='links' value='TT2'>
-					<button type='submit' class='btn' name='submit'>submit</button>
-				</form>
-			</div>
-			
-			<!--<div>
-				<form id='myform' action='<@spring.url "/upload" />' method='post' enctype="multipart/form-data">
-					<input type='file' name='atta' multiple>
-					<button type='submit' class='btn' name='upload'>Upload</button>
-				</form>
-			</div>-->
-			
-			<#if test='123456789'>abc</#if><br>
-			<#if test='99999'>99999</#if><br>
-			${test}<br>
-			{{t}}
-			<br>
-			<#list lang as l>
-				${l}<br>
-			</#list>
-			hihihi
-			<span>test</span>hihihi
-			<br>
-			<input type='radio' name='tof' value='true'>1
-			<input type='radio' name='tof' value='false'>0
-			<!--<div class='row'>
-				<#list files as file>
-					<div class='col-md-3 thumbnail'>
-						${file.getName()}
-						<img src='${file}'/>
+			<div class='row'>
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#home" data-toggle="tab">Home</a></li>
+					<li><a href="#main1" data-toggle="tab">Menu 1</a></li>
+					<li><a href="#main2" data-toggle="tab">Menu 2</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="home" class="tab-pane fade in active">
+						<h2>Hello Rick!</h2>
+						<div class='col-md-4'>
+							<input type='text' class='form-control col-md-3' ng-model='txt' />
+							<button class='btn' ng-click='doAjax()'>DoAjax</button>
+							<button class='btn' ng-click='doAjax2()'>DoAjax2</button>
+							<br>{{yes}}
+							<br>${another}
+							<br>${pub.toString()}
+						</div>
 					</div>
-				</#list>
-			</div>-->
+					<div id="main1" class="tab-pane fade">
+						<h3>Freemarker</h3>
+						
+						<@spring.message "user.admin"/> <br>
+						<@spring.messageText  "user.adb","Default" /> <br>
+						<@spring.url "/index" /> <br>
+						<@spring.message "user.hi"/> <br>
+						
+						<div>
+							<form id='myform' action='<@spring.url "/test2" />' method='post'>
+								<input type='text' name='id' ng-model='myform.id'/>
+								<input type='text' name='name' ng-model='myform.user'/>
+								<input type='text' name='age' ng-model='myform.age'/>
+								<input type='text' name='links' value='TT1'>
+								<input type='text' name='links' value='TT2'>
+								<button type='submit' class='btn' name='submit'>submit</button>
+							</form>
+						</div>
+						
+						<#if test='Request'>abc</#if>
+						<#if test='99999'>99999</#if>
+						<br>${test}<br>
+						{{t}}
+						<br>
+						<#list lang as l>
+							${l}<br>
+						</#list>
+						
+					</div>
+					<div id="main2" class="tab-pane fade">
+						<h3>Files</h3>
+						<!--<div>
+							<form id='myform' action='<@spring.url "/upload" />' method='post' enctype="multipart/form-data">
+								<input type='file' name='atta' multiple>
+								<button type='submit' class='btn' name='upload'>Upload</button>
+							</form>
+						</div>-->
+						<div class='row'>
+							<#list files as file>
+								<div class="col-xs-6 col-md-3">
+									<a href="#" class="thumbnail sameSize">
+										${file.getName()}
+										<img src='/Upload/${file.getName()}'/>
+									</a>
+								</div>
+							</#list>
+						</div>
+					</div>
+				</div>
+			</div>
 			
 		</div>
     </body>
@@ -99,6 +113,11 @@
 	.carousel-inner > .item > img {
 		width:1000px;
 		height:360px;
+	}
+	.sameSize img{
+		width:200px;
+		height:150px;
+		display:block;
 	}
 	</style>
 	<script>
@@ -194,14 +213,14 @@
 				bulletTime = game.time.now;
 				firingTimer = game.time.now;
 				
-				bullets = game.add.group();
+				/*bullets = game.add.group();
 				bullets.enableBody = true;
 				bullets.pyhsicsBodyType = Phaser.Physics.ARCADE;
 				bullets.createMultiple(30,'bullet');
 				bullets.setAll('anchor.x',0.5);
 				bullets.setAll('anchor.y',1);
 				bullets.setAll('outOfBoundsKill',true);
-				bullets.setAll('checkWorldBounds',true);
+				bullets.setAll('checkWorldBounds',true);*/
 				
 				enemyBullets = game.add.group();
 				enemyBullets.enableBody = true;
@@ -213,7 +232,7 @@
 				enemyBullets.setAll('checkWorldBounds',true);
 				
 				hero = this.add.sprite(0,300,'ship');
-				hero.anchor.setTo(0.5,0.5);//偏移
+				hero.anchor.setTo(0,0);//偏移
 				game.physics.enable(hero,Phaser.Physics.ARCADE);
 				
 				aliens = game.add.group();
@@ -233,8 +252,6 @@
 				weapon.bulletSpeed = 400;//speed
 				weapon.fireRate = 60;
 				
-				
-				
 				weapon.trackSprite(hero, 14, 0);//bullet follow ship horizon 14px, 0 vertical
 				cursors = this.input.keyboard.createCursorKeys();
 				fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
@@ -253,20 +270,12 @@
 					hero.body.velocity.y = 200;
 				}
 				if (fireButton.isDown){
-					//weapon.fire(); 
-					if(game.time.now > bulletTime){
-						var b = bullets.getFirstExists(false);
-						if(b){
-							b.reset(hero.x,hero.y+8);
-							b.body.velocity.y = -400;
-							bulletTime = game.time.now+100;
-						}
-					}
+					weapon.fire();
 				}
 				if(game.time.now>firingTimer){
 					enemyFire();
 				}
-				game.physics.arcade.overlap(bullets,aliens,collisionHandler,null,this);
+				game.physics.arcade.overlap(weapon.bullets,aliens,collisionHandler,null,this);
 				game.physics.arcade.overlap(enemyBullets,hero,enemyHits,null,this);
 				
 			}

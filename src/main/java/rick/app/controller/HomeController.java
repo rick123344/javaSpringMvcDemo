@@ -63,7 +63,7 @@ public class HomeController {
 		System.out.println(admin);*/
 		
 		model.addAttribute("name", name);
-		req.setAttribute("test","123456789");
+		req.setAttribute("test","Request");
 		
 		List<String> lang = new ArrayList<String>();
 		lang.add("Chinese");
@@ -71,12 +71,12 @@ public class HomeController {
 		lang.add("Genemar");
 		model.addAttribute("lang",lang);
 		
-		for (Ticks ticks : repository.findAll()) {
+		/*for (Ticks ticks : repository.findAll()) {
 			lang.add(ticks.toString());
-		}
+		}*/
 		//System.out.println(test.妳好);
 		//System.out.println(test.妳好.value());
-		getAnother();
+		
 		getPublish();
 		
 		File file = new File(path);
@@ -119,11 +119,6 @@ public class HomeController {
 		}
 		
 		return "redirect:home";
-	}
-	
-	@ModelAttribute("another")
-	public String getAnother(){
-		return "yes amn";
 	}
 	
 	@ModelAttribute("pub")
