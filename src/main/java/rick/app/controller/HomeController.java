@@ -39,7 +39,9 @@ public class HomeController {
 	public static String silder = "";
 	//init implement repository (because can't be new )
 	@Autowired
-	private TicksRepository repository;
+	private TicksRepository tickRepository;
+	@Autowired
+	private PublishRepository publishRepository;
 	
 	HomeController(){
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
@@ -71,7 +73,7 @@ public class HomeController {
 		lang.add("Genemar");
 		model.addAttribute("lang",lang);
 		
-		/*for (Ticks ticks : repository.findAll()) {
+		/*for (Ticks ticks : tickRepository.findAll()) {
 			lang.add(ticks.toString());
 		}*/
 		//System.out.println(test.妳好);
@@ -126,7 +128,6 @@ public class HomeController {
 		Publish p = new Publish();
 		p.setName("SmilePublish");
 		p.setId(new Long(55));
-		p.setBooks_id("B889");
 		return p;
 	}
 	
@@ -143,16 +144,19 @@ public class HomeController {
 		obj.put("data",t);
 		obj.put("test",req.getParameter("id").toString());
 		
+		Publish p = publishRepository.findOne(new Long(1));
+		System.out.println(p.getId());
+		System.out.println(p.getName());
 		
-		Ticks tes = repository.save(getTick());
+		/*Ticks tes = tickRepository.save(getTick());
 		System.out.println(tes.getId());
 		System.out.println(tes.getTick());
 		
-		Ticks tt = repository.findOne(new Long(1));
+		Ticks tt = tickRepository.findOne(new Long(1));
 		System.out.println(tt.getId());
 		System.out.println(tt.getTick());
 		
-		repository.delete(tes.getId());
+		tickRepository.delete(tes.getId());*/
 		
 		return obj.toString();
 	}

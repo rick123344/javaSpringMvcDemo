@@ -186,8 +186,12 @@
 			var explosions;
 			var weapon;
 			var cursors;
+			var starfield;
 			var fireButton;
+			var scoreText;
 			var bulletTime;
+			var score = 0;
+			var scoreString = 'Score : ';
 			var firingTimer;
 			var livingEnemies = [];
 			var game = new Phaser.Game(500,360, Phaser.CANVAS, 'phaser-example', {
@@ -204,14 +208,15 @@
 				game.load.image('enemy2', '/Phaser/sprites/space-baddie-purple.png');
 				game.load.image('enemyBullet', '/Phaser/sprites/enemy-bullet.png');
 				game.load.spritesheet('kaboom', '/Phaser/sprites/explosion.png',64,64);
-				game.load.image('background', '/Phaser/sprites/background2.png');
+				game.load.image('background', '/Phaser/sprites/starfield.png');
+				
 			}
 			
 			function create() {
 				//  加入一個 Sprite, 影像來源就是一開始載入的圖片
 				bulletTime = game.time.now;
 				firingTimer = game.time.now;
-				
+				starfield = game.add.tileSprite(0, 0, 800, 600, 'background');
 				/*bullets = game.add.group();
 				bullets.enableBody = true;
 				bullets.pyhsicsBodyType = Phaser.Physics.ARCADE;
@@ -237,12 +242,17 @@
 				aliens = game.add.group();
 				aliens.enableBody = true;
 				aliens.physicsBodyType = Phaser.Physics.ARCADE;
+				aliens.setAll('outOfBoundsKill',true);
+				aliens.setAll('checkWorldBounds',true);
 				
 				explosions = game.add.group();
 				explosions.createMultiple(30, 'kaboom');
 				explosions.forEach(setupInvader, this);
 				
-				createAliens();
+				createFixAliens();
+				createMoveAliens();
+				
+				scoreText = game.add.text(10, 10, scoreString + score, { font: '34px Arial', fill: '#fff' });
 				
 				weapon = game.add.weapon(30,'bullet');  
 				weapon.setBulletFrames(0, 80, true);				
@@ -257,6 +267,7 @@
 			}
 			
 			function update(){
+				starfield.tilePosition.y += 2;
 				hero.body.velocity.x = 0;
 				hero.body.velocity.y = 0;
 				if (cursors.left.isDown){
@@ -295,7 +306,7 @@
 				
 			}
 			function render(){
-				weapon.debug();
+				//weapon.debug();
 			}
 			function setupInvader (invader) {
 
@@ -304,21 +315,10 @@
 				invader.animations.add('kaboom');
 
 			}
-			function createAliens () {
-				var alien = aliens.create( 24, 25, 'enemy1');
-				alien.anchor.setTo(0.5, 0.5);
-				alien.animations.add('fly');
-				alien.play('fly');
-				alien.body.moves = false;
-				
-				aliens.x = 100;
-				aliens.y = 50;
-
-				//  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-				var tween = game.add.tween(alien).to( { x: 400 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+			function createMoveAliens () {
 				//moveTox, speed, 
-				var alien = aliens.create( 24, 25, 'enemy2');
-				game.time.events.loop(1000,function(){
+				var alien = aliens.create( game.world.randomX, game.world.randomY, 'enemy2');
+				game.time.events.loop(1500,function(){
 					game.add.tween(alien).to(
 						{
 							x:game.world.randomX,
@@ -330,17 +330,38 @@
 					);
 				},this);
 			}
+			function createFixAliens(){
+				var alien = aliens.create( 0, 0, 'enemy1');
+				alien.anchor.setTo(0.5, 0.5);
+				alien.animations.add('fly');
+				alien.play('fly');
+				alien.body.moves = false;
+				
+				aliens.x = 100;
+				aliens.y = 50;
+
+				//  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
+				var tween = game.add.tween(alien).to( { x: 400 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+			}
 			function collisionHandler(bullet,alien){
 				bullet.kill();
+				alien.kill();
 				var explosion = explosions.getFirstExists(false);
 				explosion.reset(alien.body.x,alien.body.y);
 				explosion.play('kaboom',30,false,true);
+				var r = Math.floor((Math.random() * 10)+1);
+				console.log(r);
+				(r>4)?createFixAliens():createMoveAliens();
+				score+=10;
+				scoreText.text = scoreString + score;
 			}
 			function enemyHits(hero,enemyBullet){
 				enemyBullet.kill();
 				var explosion = explosions.getFirstExists(false);
 				explosion.reset(hero.body.x,hero.body.y);
 				explosion.play('kaboom',30,false,true);
+				score-=10;
+				scoreText.text = scoreString + score;
 			}
 		}
 		
