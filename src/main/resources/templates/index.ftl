@@ -120,7 +120,7 @@
 	}
 	</style>
 	<script>
-		console.log("99dd");
+		
 		var app = angular.module("app",[]);
 		app.controller("demo",Demo);
 		
@@ -204,7 +204,7 @@
 				//  載入一張圖片, 將名稱命名為 pikachu
 				game.load.spritesheet('bullet', '/Phaser/sprites/rgblaser.png',4,4);
 				game.load.image('ship', '/Phaser/sprites/shmup-ship.png');
-				game.load.image('enemy1', '/Phaser/sprites/space-baddie.png');
+				game.load.spritesheet('enemy1', '/Phaser/sprites/invader32x32x4.png',32,32);
 				game.load.image('enemy2', '/Phaser/sprites/space-baddie-purple.png');
 				game.load.image('enemyBullet', '/Phaser/sprites/enemy-bullet.png');
 				game.load.spritesheet('kaboom', '/Phaser/sprites/explosion.png',64,64);
@@ -325,15 +325,15 @@
 							y:game.world.randomY
 						},
 						2000,
-						Phaser.Easing.Quadratic.InOut, 
+						Phaser.Easing.Quadratic.InOut,
 						true
 					);
 				},this);
 			}
 			function createFixAliens(){
-				var alien = aliens.create( 0, 0, 'enemy1');
+				var alien = aliens.create(0, 0, 'enemy1');
 				alien.anchor.setTo(0.5, 0.5);
-				alien.animations.add('fly');
+				alien.animations.add('fly',[ 0, 1, 2, 3 ], 20, true);
 				alien.play('fly');
 				alien.body.moves = false;
 				
@@ -350,7 +350,7 @@
 				explosion.reset(alien.body.x,alien.body.y);
 				explosion.play('kaboom',30,false,true);
 				var r = Math.floor((Math.random() * 10)+1);
-				console.log(r);
+				//console.log(r);
 				(r>4)?createFixAliens():createMoveAliens();
 				score+=10;
 				scoreText.text = scoreString + score;

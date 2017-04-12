@@ -15,7 +15,6 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'springDemo'
-include ':annotation',':aptTool'
-project(":aptTool").projectDir = new File("library/aptTool")
-project(":annotation").projectDir = new File("library/annotation")
+rootProject.name = 'aptTool'
+include ":annotation"
+project(":annotation").projectDir = new File("../annotation")

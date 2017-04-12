@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Column;
 
 import lombok.Data;
 
@@ -15,7 +16,9 @@ public class Books{
 	private Long id;
 	private String name;
 	private Long price;
-	private Long publish_id;
-	private Long author_id;
+	@Column(name="publish_id")
+	private Long publishId;
+	@Column(name="author_id")
+	private Long authorId;
 	
 }

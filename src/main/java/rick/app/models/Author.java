@@ -23,6 +23,6 @@ public class Author{
 	
 	private Long age;
 	
-	@ElementCollection
-	private List<String> links;
+	//@ElementCollection
+	//private List<String> links;
 }

@@ -1,10 +1,16 @@
 package rick.app.controller;
 
+import java.lang.reflect.Method; 
+import java.util.HashSet; 
+import java.util.Set;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+
+import java.lang.StringBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +37,13 @@ import org.json.JSONObject;
 
 //models
 import rick.app.models.*;
+//config beans
 import rick.app.config.*;
+//customer annotation
+import rick.app.annotation.*;
+
 @Controller
+@AnnoRick(level=AnnoRick.Level.UNIT,name="HRick")
 public class HomeController {
 	
 	public static String path = "";
@@ -42,28 +53,28 @@ public class HomeController {
 	private TicksRepository tickRepository;
 	@Autowired
 	private PublishRepository publishRepository;
+	@Autowired
+	private AuthorRepository authorRepository;
+	@Autowired
+	private BooksRepository bookRepository;
+	@Autowired
+	private SoldRepository soldRepository;
 	
 	HomeController(){
+		//get the Bean data
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		ctx.register(Config.class);
 		ctx.refresh();
 		MessageSource resources = ctx.getBean(MessageSource.class);
 		path = System.getProperty("user.dir")+resources.getMessage("Sys.uploadPath", null, "Default", null);
 		silder = System.getProperty("user.dir")+resources.getMessage("Sys.slidePath", null, "Default", null);
-		System.out.println(path+silder);
+		//System.out.println(path+silder);
 	}
 	
     @RequestMapping("/home")
-    public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model,HttpServletRequest req) {
+	@AnnoRick(level=AnnoRick.Level.UNIT,name="MethodRick")
+	public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model,HttpServletRequest req) {
         
-		//get the Bean data
-		/*AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		ctx.register(Config.class);
-		ctx.refresh();
-		MessageSource resources = ctx.getBean(MessageSource.class);
-		String admin = resources.getMessage("user.admin", null, "Default", null);
-		System.out.println(admin);*/
-		
 		model.addAttribute("name", name);
 		req.setAttribute("test","Request");
 		
@@ -73,17 +84,10 @@ public class HomeController {
 		lang.add("Genemar");
 		model.addAttribute("lang",lang);
 		
-		/*for (Ticks ticks : tickRepository.findAll()) {
-			lang.add(ticks.toString());
-		}*/
-		//System.out.println(test.妳好);
-		//System.out.println(test.妳好.value());
-		
 		getPublish();
 		
 		File file = new File(path);
 		model.addAttribute("files",file.listFiles());
-		
 		
 		List<Map> silderss = new ArrayList<Map>();
 		file = new File(silder);
@@ -95,6 +99,7 @@ public class HomeController {
 			silderss.add(silders);
 		}
 		model.addAttribute("silder",silderss);
+		
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
 	
@@ -137,16 +142,32 @@ public class HomeController {
 		t.setTick("abcdefg");
 		return t;
 	}
-	
+	//despacito stay 
 	@RequestMapping(value = "/test")
 	public @ResponseBody String test(@RequestBody String tick,HttpServletRequest req,@RequestParam("tick") String t){
 		JSONObject obj = new JSONObject();
-		obj.put("data",t);
+		
 		obj.put("test",req.getParameter("id").toString());
 		
+		Ticks tes = tickRepository.findOne(new Long(1));
+		System.out.println(tes.toString());
+		t = t+" "+tes.toString();
+		
 		Publish p = publishRepository.findOne(new Long(1));
-		System.out.println(p.getId());
-		System.out.println(p.getName());
+		System.out.println(p.toString());
+		t = t+" "+p.toString();
+		
+		Author a = authorRepository.findOne(new Long(1));
+		System.out.println(a.toString());
+		t = t+" "+a.toString();
+		
+		Books b = bookRepository.findOne(new Long(1));
+		System.out.println(b.toString());
+		t = t+" "+b.toString();
+		
+		Sold s = soldRepository.findOne(new Long(1));
+		System.out.println(s.toString());
+		t = t+" "+s.toString();
 		
 		/*Ticks tes = tickRepository.save(getTick());
 		System.out.println(tes.getId());
@@ -157,6 +178,24 @@ public class HomeController {
 		System.out.println(tt.getTick());
 		
 		tickRepository.delete(tes.getId());*/
+		obj.put("data",t);
+		
+		try{
+			Class test = Class.forName("rick.app.controller.HomeController");
+			Method[] method = test.getMethods();
+			for(Method m: method) { 
+				boolean flag = m.isAnnotationPresent(AnnoRick.class);
+				if(flag){
+					System.out.println(m.toString());
+					AnnoRick ar = (AnnoRick)m.getAnnotation(AnnoRick.class);
+					System.out.println(ar.name());
+					System.out.println(ar.level());
+					System.out.println(ar.tester());
+				}
+			} 
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		
 		return obj.toString();
 	}

@@ -2,11 +2,14 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
-
 // JDK 8
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+configurations {
+    javadocDeps
+	querydslapt
+}
 
 buildscript {
 	repositories {
@@ -45,6 +48,13 @@ dependencies {
     testCompile("junit:junit")
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 
+	javadocDeps "javax.portlet:portlet-api:2.0"
+	
+	querydslapt "com.mysema.querydsl:querydsl-apt:3.7.4"
+	//compile group: 'com.mysema.querydsl', name: 'querydsl-apt', version: '3.7.4'
+	compile project(':aptTool')
+	compile project(':annotation')
+	
 }
 
 jar {
@@ -55,3 +65,42 @@ jar {
 bootRun {
     addResources = true
 }
+
+//set javadoc classpath to using protlet or annotation will not found
+javadoc {
+    classpath += configurations.javadocDeps
+}
+
+task createJavadocs(type: Javadoc){
+	source = sourceSets.main.allJava
+}
+
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = ['src/main/generated']
+        }
+    }
+}
+task generateQueryDSL(type: JavaCompile, group: 'build', description: 'Generates the QueryDSL query types') {
+    source = sourceSets.main.java // input source set
+    classpath = configurations.compile + configurations.querydslapt // add processor module to classpath
+    // specify javac arguments
+    options.compilerArgs = [
+            "-proc:only",
+            "-processor", "rick.app.annoprocesser.AnnoProcesser" // your processor here
+    ]
+    // specify output of generated code
+    destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
+}
+compileJava {
+    dependsOn generateQueryDSL
+    source generateQueryDSL.destinationDir
+}
+/*
+allprojects{
+	task hello<<{
+		println "--DEMO"
+	}
+}*/
