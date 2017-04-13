@@ -158,7 +158,7 @@
 								<a data-toggle="collapse" data-parent="#accordion" href="#test"><span class='numTitle'>4</span>Test Time!~~</a>
 							</h4>
 						</div>
-						<div id="test" class="panel-collapse collapse in">
+						<div id="test" class="panel-collapse collapse">
 							<div class="panel-body">
 								<h2>TEST</h2>
 								<pre class='prettyprint lang-bash'>
