@@ -34,7 +34,7 @@
 						3.將會有1個主專案與2個子專案(a master project and two subproject)<br>
 						4.每個專案會有一支java檔，分別為client,annotation,annotation processor<br>
 						5.本篇會用到Google的AutoService及一款querydsl套件<br>
-						6.這篇是我在創建Annotation Processor的流程，因此語法等不會做特別的說明
+						6.這篇是我在創建Annotation Processor的流程，因此語法等不會做特別的說明<br>
 						7.專案路徑D:\springDemo\<br>
 						<pre class="prettyprint">
 							<#include "prettyCode/rootPath.ftl">
@@ -165,6 +165,9 @@
 									<#include "prettyCode/testBuild.ftl">
 								</pre>
 								之後將可已在編譯時看到我們在client所設定AnnoRick的值
+								<div>
+									<img src='/Img/annoResult.jpg'/>
+								</div>
 							</div>
 						</div>
 					</div>
