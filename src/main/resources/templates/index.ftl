@@ -47,6 +47,7 @@
 				<div class="tab-content">
 					<div id="home" class="tab-pane fade in active">
 						<h2>Hello Rick!</h2>
+						<h4><a href='<@spring.url "/annotation"/>'>myAnnotation</a></h4>
 						<div class='col-md-4'>
 							<input type='text' class='form-control col-md-3' ng-model='txt' />
 							<button class='btn' ng-click='doAjax()'>DoAjax</button>

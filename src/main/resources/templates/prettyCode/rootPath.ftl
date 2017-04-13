@@ -1,0 +1,13 @@
+springDemo\
+	-library\
+		-annotation\
+			-build.gradle
+			-setting.gradle
+			-src\main\java\AnnoRick.java (annotation file)
+		-aptTool\
+			-build.gradle
+			-setting.gradle
+			-src\main\java\AnnoProcesser.java (annotation processor file)
+	-build.gradle
+	-setting.gradle
+	-src\main\java\rick\app\controller\HomeController.java (client file)

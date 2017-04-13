@@ -233,6 +233,11 @@ public class HomeController {
 		return t;
 	}
 	
+	@RequestMapping("/annotation")
+	public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
+		return "annotation";
+	}
+	
 }
 
 enum test{
