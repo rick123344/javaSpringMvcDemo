@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import org.json.JSONObject;
 
@@ -48,6 +49,9 @@ public class HomeController {
 	
 	public static String path = "";
 	public static String silder = "";
+	
+	private String progress = "0";
+	
 	//init implement repository (because can't be new )
 	@Autowired
 	private TicksRepository tickRepository;
@@ -59,6 +63,14 @@ public class HomeController {
 	private BooksRepository bookRepository;
 	@Autowired
 	private SoldRepository soldRepository;
+	
+	//@Value => #表示spel(spring expression language)內容, $表示一般properties、yml等檔案的屬性
+	// #=>#{?:}   $=>${:}
+	//@Value("#{'${user.dir}'.concat('yesss')?:noSuchVar}")
+	//private	String hello;
+	
+	@Value("#{'abcdefggggg'}")
+	private String hello;
 	
 	HomeController(){
 		//get the Bean data
@@ -78,13 +90,9 @@ public class HomeController {
 		model.addAttribute("name", name);
 		req.setAttribute("test","Request");
 		
-		List<String> lang = new ArrayList<String>();
-		lang.add("Chinese");
-		lang.add("English");
-		lang.add("Genemar");
-		model.addAttribute("lang",lang);
-		
 		getPublish();
+		
+		System.out.println(hello);
 		
 		File file = new File(path);
 		model.addAttribute("files",file.listFiles());
@@ -102,6 +110,11 @@ public class HomeController {
 		
 		return "index";// it's will archieve to src/main/resources/templates/index.ftl	
     }
+	
+	@RequestMapping("/annotation")
+	public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
+		return "annotation";
+	}
 	
 	@RequestMapping("/upload")
     public String upload(@RequestParam("atta") MultipartFile[] files,Model model) {
@@ -136,12 +149,6 @@ public class HomeController {
 		return p;
 	}
 	
-	public Ticks getTick(){
-		Ticks t = new Ticks();
-		//t.setId(new Long(6));
-		t.setTick("abcdefg");
-		return t;
-	}
 	//despacito stay 
 	@RequestMapping(value = "/test")
 	public @ResponseBody String test(@RequestBody String tick,HttpServletRequest req,@RequestParam("tick") String t){
@@ -161,7 +168,7 @@ public class HomeController {
 		System.out.println(a.toString());
 		t = t+" "+a.toString();
 		
-		Books b = bookRepository.findOne(new Long(1));
+		Books b = bookRepository.findOne(new Long(2));
 		System.out.println(b.toString());
 		t = t+" "+b.toString();
 		
@@ -180,7 +187,8 @@ public class HomeController {
 		tickRepository.delete(tes.getId());*/
 		obj.put("data",t);
 		
-		try{
+		//simple test for the annotation is have values
+		/*try{
 			Class test = Class.forName("rick.app.controller.HomeController");
 			Method[] method = test.getMethods();
 			for(Method m: method) { 
@@ -195,7 +203,7 @@ public class HomeController {
 			} 
 		}catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
 		
 		return obj.toString();
 	}
@@ -227,15 +235,34 @@ public class HomeController {
 		return obj.toString();
 	}
 	
+	@RequestMapping(value="/getDbData")
+	@ResponseBody
+	public String dbData(){
+		progress = "0";
+		JSONObject obj = new JSONObject();
+		obj.put("tick",tickRepository.findAll());
+		progress = "0.2";
+		obj.put("public",publishRepository.findAll());
+		progress = "0.4";
+		obj.put("author",authorRepository.findAll());
+		progress = "0.6";
+		obj.put("book",bookRepository.findAll());
+		progress = "0.8";
+		obj.put("sold",soldRepository.findAll());
+		progress = "0.95";
+		return obj.toString();
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/progress")
+	public String getProgress(){
+		return progress;
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/doajax")
 	public String test(@RequestParam("user") String t){
 		return t;
-	}
-	
-	@RequestMapping("/annotation")
-	public String homes(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
-		return "annotation";
 	}
 	
 }

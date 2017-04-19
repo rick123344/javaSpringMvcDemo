@@ -13,9 +13,9 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 public class Config {
     
 	@Bean(name = "messageSource")
-	public MessageSource messageSource() {
+	public static MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasenames("properties/testMsg");
+		messageSource.setBasenames("properties/testMsg");//testMsg
 		messageSource.setDefaultEncoding("UTF-8");
 		return messageSource;
 	} 

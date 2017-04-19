@@ -4,10 +4,12 @@
 	<head>
 		<title>Index Demo</title>
 		<link href="/css/bootstrap.min.css" rel="stylesheet"/>
+		<link href="/css/loading-bar.css" rel="stylesheet"/>
 		<script src="/js/jquery.min.js"></script>
 		<script src="/js/angular1.5.8.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
 		<script src="/js/phaser.min.js"></script>
+		<script src="/js/loading-bar.js"></script>
 	</head>
     <body ng-controller='demo'>
 		<div class='container'> 
@@ -55,35 +57,54 @@
 							<br>{{yes}}
 							<br>${pub.toString()}
 						</div>
+						<div class='col-md-6'>
+							Properties (user.admin):<@spring.message "user.admin"/> <br>
+							Properties (user.adb)<@spring.messageText  "user.adb","Default" /> <br>
+							<div>
+								<form id='myform' action='<@spring.url "/test2" />' method='post'>
+									<input type='text' name='id' ng-model='myform.id'/>
+									<input type='text' name='name' ng-model='myform.user'/>
+									<input type='text' name='age' ng-model='myform.age'/>
+									<input type='text' name='links' value='TT1'>
+									<input type='text' name='links' value='TT2'>
+									<button type='submit' class='btn' name='submit'>submit</button>
+								</form>
+							</div>
+						</div>
 					</div>
 					<div id="main1" class="tab-pane fade">
-						<h3>Freemarker</h3>
-						
-						<@spring.message "user.admin"/> <br>
-						<@spring.messageText  "user.adb","Default" /> <br>
-						<@spring.url "/index" /> <br>
-						<@spring.message "user.hi"/> <br>
-						
-						<div>
-							<form id='myform' action='<@spring.url "/test2" />' method='post'>
-								<input type='text' name='id' ng-model='myform.id'/>
-								<input type='text' name='name' ng-model='myform.user'/>
-								<input type='text' name='age' ng-model='myform.age'/>
-								<input type='text' name='links' value='TT1'>
-								<input type='text' name='links' value='TT2'>
-								<button type='submit' class='btn' name='submit'>submit</button>
-							</form>
+						<div class='row'>
+							<input type='button' class='btn' ng-click="getDB()" value='getDB'>
 						</div>
-						
-						<#if test='Request'>abc</#if>
-						<#if test='99999'>99999</#if>
-						<br>${test}<br>
-						{{t}}
 						<br>
-						<#list lang as l>
-							${l}<br>
-						</#list>
-						
+						<div>
+							<div class='' id='progress'><div id='msg'></div></div>
+						</div>
+						<br>
+						<div class='row'>
+							<div ng-repeat="(fname,fs) in allDb" class='thumbnail' >
+								<h3>{{fname}}:</h3><br>
+								<table class='table' name='{{fname}}'>
+									<thead>
+										<tr>
+											<th ng-repeat="(hkey,hvalue) in fs[0]">
+												{{hkey}}
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="(fkey,fval) in fs">
+											<td ng-repeat="(key,value) in fval" class='edit' table-name="{{fname}}" table-id="{{fs[fkey].id}}" column-name="{{key}}" ng-dblclick="inlineEdit($event,fname,fs[fkey].id,key)">
+												{{value}}
+											</td>
+											<td>
+												<a class='remove' ng-click="Remove(fval.id)" name="{{fval.id}}"><span class="glyphicon glyphicon-remove"></span></a>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
 					</div>
 					<div id="main2" class="tab-pane fade">
 						<h3>Files</h3>
@@ -119,15 +140,42 @@
 		height:150px;
 		display:block;
 	}
+	#loading-bar .bar {
+		position: relative;
+		height:20px;
+	}
+	#loading-bar-spinner{
+		position: relative;
+	}
 	</style>
 	<script>
 		
-		var app = angular.module("app",[]);
+		var app = angular.module("app",['cfp.loadingBar']);
 		app.controller("demo",Demo);
-		
-		function Demo($scope,$http){
-			$scope.t = "testMsg";
+		//config for progress bar
+		app.config(function(cfpLoadingBarProvider){
+			cfpLoadingBarProvider.parentSelector = '#progress';
+			cfpLoadingBarProvider.autoIncrement = false;
+		});
+		app.directive("compile",['$compile',function($compile){
+			return function(scope,element,attrs){
+				scope.$watch(
+					function(scope){
+						return scope.$eval(attrs.compile);
+					},
+					function(value){
+						element.html(value);
+						$compile(element.contents())(scope);
+					},true
+				);
+			};
+		}]);
+		function Demo($scope,$http,$injector,$compile,$window,$timeout,$interval,cfpLoadingBar){
+			
+			$scope.progressBar = cfpLoadingBar;
+			$scope.timer = null;
 			$scope.link = ["1","2","3","4","5"];
+			$scope.allDb = [];
 			$scope.myform = {
 				id:"6",
 				user:"abccc",
@@ -164,6 +212,84 @@
 				});
 			}
 			
+			$scope.getDB = function(){
+				$scope.barStart($scope.progressBar);
+				$http({
+					method:'POST',
+					url:'<@spring.url "/getDbData" />',
+					//why to bind viewmodel with java =>1. $("#myform").serialize(); 2. javascript object with param
+					data:$.param({id:""}),//$("#myform").serialize() //to serial data or must using file_get_contents to get post data
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'}//{'Content-type': 'application/json'} //{'Content-Type': 'application/x-www-form-urlencoded'}
+				}).then(function success(msg){
+					//console.log(msg.data);
+					$scope.allDb = msg.data;
+					$scope.barComplete($scope.progressBar);
+				},function error(err,status,headers,config){
+					console.log(err);
+				});
+			}
+			
+			$scope.barStart = function(bar){
+				bar.start();
+				$scope.timer = $interval(function() {
+					$scope.getProgress(bar);
+				}, 500,null,false);
+
+			}
+			
+			$scope.barComplete = function(bar){
+				bar.complete();
+				if (angular.isDefined($scope.timer)) {
+                    $interval.cancel($scope.timer);
+                }
+				var status = Math.round(bar.status()*100+"%");
+				$("#msg").html(status);
+			}
+			
+			$scope.getProgress = function(bar){
+				$http({
+					method:'POST',
+					url:'<@spring.url "/progress" />',
+					//why to bind viewmodel with java =>1. $("#myform").serialize(); 2. javascript object with param
+					data:$.param({id:""}),//$("#myform").serialize() //to serial data or must using file_get_contents to get post data
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'}//{'Content-type': 'application/json'} //{'Content-Type': 'application/x-www-form-urlencoded'}
+				}).then(function success(msg){
+					//console.log(msg.data);
+					bar.set(msg.data*1);
+					var status = Math.round(bar.status()*100);
+					$("#msg").html(status + "%");
+				},function error(err,status,headers,config){
+					console.log(err);
+				});
+			}
+			
+			$scope.Remove = function(id=""){
+				console.log(id);
+			}
+			
+			$scope.inlineEdit = function(event,tableName,id,column){
+				if(column=='id'){
+					return;
+				}
+				var dom = angular.element(event.target);
+				var val = dom.text().trim();
+				var template = "<input type='text' class='form-control' id='inlineText' ng-blur=doEdit($event,tableName,id,column) value='"+val+"'/>";
+				//compile in javascript
+				$injector.invoke(function($compile){
+					var i = $compile(template);
+					var content = i($scope);
+					dom.html(content);
+				});
+				//focus column
+				var nelem = $window.document.getElementById('inlineText');
+				nelem.focus();
+			}
+			
+			$scope.doEdit = function(event,tableName,id,column){
+				var text = angular.element(event.target);
+				var dom  = text.parent(".edit");
+				dom.html(text.val());
+			}
 			
 		}
 		
