@@ -47,8 +47,11 @@ import rick.app.annotation.*;
 @AnnoRick(level=AnnoRick.Level.UNIT,name="HRick")
 public class HomeController {
 	
-	public static String path = "";
-	public static String silder = "";
+	@Value("#{'${user.dir}'.concat('${Sys.uploadPath}')}")
+	public String path;
+	
+	@Value("#{'${user.dir}'.concat('${Sys.slidePath}')}")
+	public String silder;
 	
 	private String progress = "0";
 	
@@ -65,22 +68,25 @@ public class HomeController {
 	private SoldRepository soldRepository;
 	
 	//@Value => #表示spel(spring expression language)內容, $表示一般properties、yml等檔案的屬性
-	// #=>#{?:}   $=>${:}
+	// #=>#{?:}  =>可直接預設值   @Value("#{'abcdffffff'}")  
+	// $=>${:}   =>不可直接預設值
 	//@Value("#{'${user.dir}'.concat('yesss')?:noSuchVar}")
 	//private	String hello;
 	
-	@Value("#{'abcdefggggg'}")
+	//when using @Value , the properties must be regist by using @PropertySource (annotation bean) to classpath
+	//@Value("${user.admin:noSuchVar}")
+	//@Value("#{messageSource[user.admin]?:noSuchVar}")//not working
+	@Value("${what.the.fxck:noSuchVar}")
 	private String hello;
 	
 	HomeController(){
-		//get the Bean data
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		//instead using follow code, you can just using @Value to get properties data
+		/*AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		ctx.register(Config.class);
 		ctx.refresh();
 		MessageSource resources = ctx.getBean(MessageSource.class);
 		path = System.getProperty("user.dir")+resources.getMessage("Sys.uploadPath", null, "Default", null);
-		silder = System.getProperty("user.dir")+resources.getMessage("Sys.slidePath", null, "Default", null);
-		//System.out.println(path+silder);
+		silder = System.getProperty("user.dir")+resources.getMessage("Sys.slidePath", null, "Default", null);*/
 	}
 	
     @RequestMapping("/home")
@@ -92,7 +98,7 @@ public class HomeController {
 		
 		getPublish();
 		
-		System.out.println(hello);
+		//System.out.println(hello);
 		
 		File file = new File(path);
 		model.addAttribute("files",file.listFiles());
